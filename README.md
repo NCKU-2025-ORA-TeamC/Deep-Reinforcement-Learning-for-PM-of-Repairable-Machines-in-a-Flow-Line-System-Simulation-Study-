@@ -47,14 +47,18 @@ The problem is modeled as a **Markov Decision Process (MDP)**:
 - `B_t`: buffer level at time t  
 - `M_t`: remaining maintenance time (0 if idle)  
 - `HI_t`: machine health index (0–1)
-<div align="center">
+
 **State Meaning**
+
+<div align="center">
 |Condition	|Buffer	|Maintenance Time	|HI|
 |--------|----|----|--------|
 |Maintenance	|X	|> 0	|X|
 |Operating	|> 0	|= 0|	> 0|
 |Idle	|= 0	|= 0	|> 0|
 </div>
+
+
 **Action space:**  
 
 $$a_t ∈ [ do nothing, PM, CM ] $$
