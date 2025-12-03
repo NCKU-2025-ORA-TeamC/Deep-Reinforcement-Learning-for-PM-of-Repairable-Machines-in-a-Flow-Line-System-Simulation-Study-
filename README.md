@@ -1,6 +1,8 @@
 # Deep-Reinforcement-Learning-for-PM-of-Repairable-Machines-in-a-Flow-Line-System-Simulation-Study-
 Final report of Operations Research Applications, 2025 @ NCKU Institute of Manufacturing Information and Systems 
 
+Group C: C24106121, N46144056 and P76147051 
+
 ## 1. Background and Motivation
 
 ### 1.1 Motivation
@@ -46,9 +48,25 @@ The problem is modeled as a **Markov Decision Process (MDP)**:
 - `M_t`: remaining maintenance time (0 if idle)  
 - `HI_t`: machine health index (0–1)
 
+**State Meaning**
+|Condition	|Buffer	|Maintenance Time	|HI|
+|--------|----|----|--------|
+|Maintenance	|X	|> 0	|X|
+|Operating	|> 0	|= 0|	> 0|
+|Idle	|= 0	|= 0	|> 0|
+
 **Action space:**  
 
 $$a_t ∈ [ do nothing, PM, CM ] $$
+
+|Action	|Meaning|
+|---|---|
+|0	|Do nothing|
+|1	|Preventive Maintenance (PM)|
+|2	|Corrective Maintenance (CM)|
+
+CM is only allowed when the machine has failed.
+
 
 **Reward function:**  
 
@@ -126,6 +144,7 @@ plt.ylabel("MSE Loss")
 
 plt.show()
 ```
+<img width="958" height="368" alt="圖片" src="https://github.com/user-attachments/assets/7ddebad7-61d2-47e0-8675-de69f4b0d0e3" />
 
 ### 3.3 Results and Managerial Implications
 
