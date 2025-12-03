@@ -51,23 +51,28 @@ The problem is modeled as a **Markov Decision Process (MDP)**:
 **State Meaning**
 
 <div align="center">
+ 
 |Condition	|Buffer	|Maintenance Time	|HI|
 |--------|----|----|--------|
 |Maintenance	|X	|> 0	|X|
 |Operating	|> 0	|= 0|	> 0|
 |Idle	|= 0	|= 0	|> 0|
+
 </div>
 
 
 **Action space:**  
 
 $$a_t ∈ [ do nothing, PM, CM ] $$
+
 <div align="center">
+ 
 |Action	|Meaning|
 |---|---|
 |0	|Do nothing|
 |1	|Preventive Maintenance (PM)|
 |2	|Corrective Maintenance (CM)|
+
 </div>
 CM is only allowed when the machine has failed.
 
