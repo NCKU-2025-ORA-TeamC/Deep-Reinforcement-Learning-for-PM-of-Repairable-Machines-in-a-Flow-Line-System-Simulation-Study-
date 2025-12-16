@@ -1,7 +1,12 @@
-# Deep-Reinforcement-Learning-for-PM-of-Repairable-Machines-in-a-Flow-Line-System-Simulation-Study
+# Deep Reinforcement Learning for PM of Repairable Machines in a Flow Line System - A Simulation Study
 Final report of Operations Research Applications, Dec 2025 @ NCKU Institute of Manufacturing Information and Systems 
 
-Group C: **Jen-Chien, Tseng (C24106121)**, **Sing-Yu, Bao (N46144056)** and **Josue Fernandez (P76147051)**
+Group C
+| Name                 | Student ID    |
+|----------------------|---------------|
+| **Jen-Chien, Tseng** | **C24106121** |
+| **Sing-Yu, Bao**     | **N46144056** |
+| **Josue Fernandez**  | **P76147051** |
 
 ![Made with Python](https://img.shields.io/badge/Made%20with-Python-blue?logo=python)
 
@@ -32,18 +37,14 @@ This study formulates preventive maintenance scheduling for a repairable flow-li
 
 This study is explicitly designed as a controlled comparison between two scenarios with different system complexity, aiming to identify when and why deep reinforcement learning becomes necessary for preventive maintenance (PM) decisions.
 
-Rather than evaluating a single system in isolation, we construct two scenarios that share the same modeling philosophy but differ in structural and stochastic characteristics. This allows us to isolate the effect of system complexity on policy learning and performance.
+Rather than evaluating a single system in isolation, we construct two scenarios that share the same modeling philosophy but differ in structural and stochastic characteristics. This allows us to isolate the effect of system complexity on policy learning and performance, as well as measure the added value from training reinforcement learning model for different levels of complexity.
 
 ### Scenario A: Simple Flow-Line System (Benchmark Scenario)
 
 - One buffer and one machine stage
-
 - Single machine
-
 - Deterministic production capacity
-
 - Linear age-dependent failure probability
-
 - Minimal buffer interaction (no upstream/downstream propagation)
 
 This scenario serves as a benchmark. Its purpose is not to maximize RL performance, but to verify whether the DDQN can learn intuitive PM behavior comparable to classical age-based or threshold-based policies.
@@ -51,13 +52,9 @@ This scenario serves as a benchmark. Its purpose is not to maximize RL performan
 ### Scenario B: Complex Flow-Line System (Target Scenario)
 
 - Two buffers and two sequential stages
-
 - Two parallel machines per stage (4 machines total)
-
 - Deterministic production capacity per machine
-
 - Weibull failure distribution (k > 1), capturing aging-induced failure acceleration
-
 - Strong interdependence through buffers, allowing blockage and starvation to propagate
 
 This scenario represents a realistic manufacturing environment, where local maintenance decisions generate non-local system impacts.
@@ -65,11 +62,8 @@ This scenario represents a realistic manufacturing environment, where local main
 **Comparison Objectives The two scenarios are compared along the following dimensions:**
 
 - Preventive maintenance timing behavior
-
 - Frequency and distribution of corrective maintenance events
-
 - Accumulated total system cost
-
 - Sensitivity of learned policies to buffer congestion and starvation risk
 
 ## 3.2 Method Justification
@@ -77,42 +71,35 @@ This scenario represents a realistic manufacturing environment, where local main
 **Method Justification Assumptions & Conditions**
 
 - Time is discretized into equal timesteps.
-
 - Machine degradation follows a stochastic process with age-dependent failure probability.
-
 - Corrective maintenance is automatically triggered upon failure.
-
 - No limit is imposed on the number of machines under maintenance simultaneously.
 
 **Why Reinforcement Learning?**
 
 - The system is stochastic, non-linear, and high-dimensional.
-
 - Buffer-machine interactions differ substantially between Scenario A and B.
-
 - RL enables learning adaptive policies that respond to system-level states.
 
 **Pros**
 
 - Allows direct comparison of policy behavior under different structural complexities.
-
 - Scales from simple to complex systems without reformulating the optimization problem.
 
 **Cons / Limitations**
 
 - Training time increases significantly in Scenario B.
-
-- Learned policies may be scenario-specific.
+- Learned policies are scenario-specific: retraining is needed for different scenarios.
 
 ## 3.3 MDP Formulation and DDQN
 The preventive maintenance decision problem is formulated as a Markov Decision Process (MDP).
 
 **State space**
-At time step *t*, the system state is defined as:
+At time step *t*, the system state is defined as the composition of three vectors:
 
 $$s_t = [A_t, B_t, M_t]$$
 
-where `A_t` denotes machine ages, `B_t` denotes buffer inventory levels, and `M_t` denotes remaining maintenance timers.
+where `A_t` denotes machine ages, `B_t` denotes buffer inventory levels, and `M_t` denotes remaining maintenance time for each machine.
 
 **Action space**
 The action is a vector of binary decisions:
@@ -125,45 +112,38 @@ where `a_t^i = 1` indicates performing preventive maintenance on machine `i`. Co
 System transitions are governed by production capacity, buffer constraints, stochastic arrivals, and probabilistic machine failures. Transition probabilities are unknown and learned implicitly through interaction.
 
 **Uncertainty**
+- Scenario A: Linear aging failure probability (factor of 0.01)
+- Scenario B: Weibull-distributed failure time (k = 2, λ = 30)
 
-- Scenario A: Linear aging failure probability
-
-- Scenario B: Weibull-distributed failure time (k > 1)
-
-WIP arrivals follow a Poisson process in both scenarios
+WIP arrivals follow a periodic Poisson process in both scenarios.
 
 **Reward function**
 The immediate reward is defined as the negative total cost incurred in each time step:
 
-$$r_t = - (C_{PM,t} + C_{CM,t} + C_{block,t} + C_{starv,t})$$
+$$r_t = - (C_{PM,t} + C_{CM,t} + C_{block,t} + C_{starv,t} + C_{idle,t})$$
 
 The objective is to learn a policy `π(a|s)` that maximizes the expected discounted cumulative reward.
 
 **Learning Algorithm**
 
 - Double Deep Q-Network (DDQN)
-
-- Shared feature layers + machine-specific decision heads
-
+- Shared feature layers + machine-specific independent linear layer with decision heads
 - Experience replay buffer size: 5000
-
+- Training episodes: 800
+- Steps per episode: 1,000
+- Training frequency: once every 4 steps
 - Batch size: 128
-
 - Discount factor (γ): 0.95
-
+- Learning rate starts at 0.0004 and decays by a factor of 0.5 every 200 episodes
 - ε-greedy exploration with logarithmic decay
- 
-- Target network update every 10 episodes
+- Target network updates every 10 episodes
 ---
 
 # 4. Data Collection and Analysis Results
-
 ## 4.1 Data Collection
 
 Two datasets are generated via simulation, corresponding to the two scenarios.
-
 - Scenario A dataset: Low-dimensional state space, linear failure process
-
 - Scenario B dataset: High-dimensional state space, Weibull failure process
 
 All data are generated online during agent–environment interaction. This ensures consistency between training and evaluation conditions and allows fair comparison across scenarios.
@@ -185,15 +165,10 @@ All data are generated online during agent–environment interaction. This ensur
 The DDQN is trained and evaluated separately under Scenario A and Scenario B using identical learning hyperparameters. This ensures that observed performance differences are attributable to system structure rather than algorithmic tuning.
 
 For each scenario, we track:
-
 - Episode-level cumulative reward (total cost)
-
 - Preventive vs corrective maintenance counts
-
 - Average machine age at PM execution
-
 - Frequency of starvation and blockage events
-
 - Training convergence behavior is also compared to examine how state dimensionality and stochastic complexity affect learning stability.
 
 ## 4.3 Results and Managerial Implications
