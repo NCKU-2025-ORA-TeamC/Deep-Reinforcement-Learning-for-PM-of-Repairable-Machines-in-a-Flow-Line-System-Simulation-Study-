@@ -168,6 +168,18 @@ Two datasets are generated via simulation, corresponding to the two scenarios.
 
 All data are generated online during agent–environment interaction. This ensures consistency between training and evaluation conditions and allows fair comparison across scenarios.
 
+<div align="center">
+ 
+| Dimension     | Scenario A | Scenario B |
+| ------------- | ---------- | ---------- |
+| Machines      | 1          | 4          |
+| Buffers       | 1          | 2          |
+| Failure model | Linear     | Weibull    |
+| Interaction   | None       | Strong     |
+| Value of RL   | Low        | High       |
+
+</div>
+
 ## 4.2 Analysis
 
 The DDQN is trained and evaluated separately under Scenario A and Scenario B using identical learning hyperparameters. This ensures that observed performance differences are attributable to system structure rather than algorithmic tuning.
