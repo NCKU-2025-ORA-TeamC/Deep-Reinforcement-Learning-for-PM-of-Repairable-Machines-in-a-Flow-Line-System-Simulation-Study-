@@ -207,22 +207,17 @@ This study demonstrates that preventive maintenance scheduling in repairable flo
 
 # 6. References
 
-Alrabghi, A., & Tiwari, A. (2016). Simulation-based optimisation of maintenance systems. Computers & Industrial Engineering, 82, 167–182.
+Alrabghi, A., & Tiwari, A. (2015). State of the art in simulation-based optimisation for maintenance systems. Computers & Industrial Engineering, 82, 167–182. https://doi.org/10.1016/j.cie.2014.12.022
 
-Cassady, C. R., & Kutanoglu, E. (2005). Integrating preventive maintenance planning and production scheduling. IEEE Transactions on Reliability, 54(2), 304–309.
+Cassady, C. R., & Kutanoglu, E. (2005). Integrating preventive maintenance planning and production scheduling for a single machine. IEEE Transactions on Reliability, 54(2), 304–309. https://doi.org/10.1109/TR.2005.845967
 
 Hung, YH., Shen, HY. & Lee, CY. Deep reinforcement learning-based preventive maintenance for repairable machines with deterioration in a flow line system. Ann Oper Res (2024).https://doi.org/10.1007/s10479-024-06207-x
 
 Jianyu Su, Jing Huang, Stephen Adams, Qing Chang, and Peter A. Beling. 2022. Deep multi-agent reinforcement learning for multi-level preventive maintenance in manufacturing systems▪. Expert Syst. Appl. 192, C (Apr 2022). https://doi.org/10.1016/j.eswa.2021.116323
 
-Li, H., & Meerkov, S. M. (2009). Production Systems Engineering. Springer.
-
 Liu, Y., Wang, W., Hu, Y., Hao, J., Chen, X., & Gao, Y. (2019). Multi-agent game abstraction via graph attention neural network. arXiv preprint arXiv:1911.10715. https://doi.org/10.48550/arXiv.1911.10715
 
-Sutton, R. S., & Barto, A. G. (2018). Reinforcement Learning: An Introduction. MIT Press.
+Sutton, R. S., & Barto, A. G. (2018). Reinforcement learning: An introduction (2nd ed.). The MIT Press.
 
-Van Hasselt, H., Guez, A., & Silver, D. (2016). Deep reinforcement learning with double Q-learning. AAAI Conference on Artificial Intelligence.
-
-Wang, J., & Zhang, H. (2019). Reinforcement learning approaches for preventive maintenance: A review. Computers & Industrial Engineering, 135, 28–41.
-
+van Hasselt, H., Guez, A., & Silver, D. (2016). Deep reinforcement learning with double Q-learning. Proceedings of the AAAI Conference on Artificial Intelligence, 30(1). https://doi.org/10.1609/aaai.v30i1.10295
 
