@@ -821,7 +821,7 @@ def train_maintenance_system(env, config, checkpoint_path):
     return agent, rewards_per_episode, losses, epsilon_history, lr_history
 
 
-def visualize_training(rewards, losses, epsilon, lr):
+def visualize_training(rewards, losses, epsilon, lr, save_as):
     """Visualize training results"""
     fig = plt.figure(figsize=(16, 10))
     gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.3)
@@ -895,11 +895,119 @@ def visualize_training(rewards, losses, epsilon, lr):
         ax6.grid(True)
     ax6.set_xbound(lower=-50, upper=850)
 
+    plt.tight_layout()
     plt.show()
+
+    plt.savefig(save_as, dpi=300)
+
+
+def policy_run_to_failure(state, env):
+    """Never perform PM. Only CM happens upon failure (handled by env)."""
+    # Always return action 0 (Do Nothing) for all machines
+    return [0] * env.total_machines
+
+def policy_age_dependent(state, env, threshold_age):
+    """Perform PM if a machine's age exceeds a fixed threshold."""
+    actions = []
+    # The first 'total_machines' elements of the state are the normalized ages
+    normalized_ages = state[:env.total_machines]
+
+    for norm_age in normalized_ages:
+        # Denormalize to get actual age
+        actual_age = norm_age * env.max_machine_age
+        if actual_age >= threshold_age:
+            actions.append(1) # Perform PM
+        else:
+            actions.append(0) # Do Nothing
+    return actions
+
+def evaluate_policies(env, agent, policies, num_episodes=20):
+    """
+    Evaluates the trained agent against baseline policies.
+    """
+    results = {}
+
+    print(f"Starting evaluation over {num_episodes} episodes per policy...")
+
+    for name, policy_func in policies.items():
+        print(f"Evaluating: {name}")
+        policy_rewards = []
+
+        for _ in range(num_episodes):
+            state = env.reset()
+            total_reward = 0
+            done = False
+
+            while not done:
+                if name == "Double DQN":
+                    # Use the trained agent (exploit only, epsilon=0)
+                    original_epsilon = agent.epsilon
+                    agent.epsilon = 0.0
+                    actions = agent.choose_actions(state)
+                    agent.epsilon = original_epsilon # restore epsilon
+                else:
+                    # Use the baseline policy function
+                    actions = policy_func(state, env)
+
+                next_state, reward = env.step(actions)
+                total_reward += reward
+                state = next_state
+                done = env.is_episode_done()
+
+            policy_rewards.append(total_reward)
+
+        results[name] = policy_rewards
+        print(f"  -> Avg Reward: {np.mean(policy_rewards):.2f}")
+    return results
+
+
+def compare_policies(config, eval_policies, eval_episodes):
+    global save_dir
+
+    # Ensure your environment is reset with the same parameters used for training
+    eval_env = FlowLineEnvironment(
+        **config['env_params']
+    )
+
+    assert save_dir is not None, "Checkpoint directory path 'save_dir' has not been set."
+
+    filename = f"ddqn_{config['ID']}.pth"
+    checkpoint_path = os.path.join(save_dir, filename)
+    eval_agent = load_trained_agent(eval_env, checkpoint_path, config)
+
+    # --- Run Evaluation ---
+    # Assuming 'agent' is your trained DoubleDQNAgent instance from the training block
+    eval_results = evaluate_policies(eval_env, eval_agent, eval_policies, num_episodes=eval_episodes)
+
+    # --- Box Plot ---
+    # Convert results to a DataFrame for plotting with Seaborn
+    df_results = pd.DataFrame(eval_results)
+
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(data=df_results, palette="viridis")
+
+    plt.title("Comparison of Accumulated Rewards (Costs) over 1000 Steps", fontsize=14)
+    plt.ylabel("Accumulated Reward (Negative Cost)", fontsize=12)
+    plt.xlabel("Policy Method", fontsize=12)
+    plt.grid(True, axis='y', linestyle='--', alpha=0.7)
+    plt.xticks(rotation=0) # Keep labels horizontal
+
+    plt.tight_layout()
+    plt.show()
+
+    figname = f"ddqn_{config['ID']}_comparison.png"
+    figpath = os.path.join(save_dir, figname)
+    plt.savefig(figpath, dpi=300)
+
+    print("\nDetailed Statistics:")
+    print(df_results.describe().loc[['mean', 'std', 'min', 'max']].T)
+
+
 
 print("=" * 70)
 print("Flow-Line Maintenance Scheduling with Double DQN")
 print("=" * 70)
+
 
 # === CONFIGURATION FOR SIMPLE RUN ===
 # Change 'ID' to train a separate model (e.g., "Experiment_A", "Experiment_B")
@@ -1067,106 +1175,6 @@ def load_trained_agent(env, checkpoint_path, config):
 
     return agent
 
-def policy_run_to_failure(state, env):
-    """Never perform PM. Only CM happens upon failure (handled by env)."""
-    # Always return action 0 (Do Nothing) for all machines
-    return [0] * env.total_machines
-
-def policy_age_dependent(state, env, threshold_age):
-    """Perform PM if a machine's age exceeds a fixed threshold."""
-    actions = []
-    # The first 'total_machines' elements of the state are the normalized ages
-    normalized_ages = state[:env.total_machines]
-
-    for norm_age in normalized_ages:
-        # Denormalize to get actual age
-        actual_age = norm_age * env.max_machine_age
-        if actual_age >= threshold_age:
-            actions.append(1) # Perform PM
-        else:
-            actions.append(0) # Do Nothing
-    return actions
-
-def evaluate_policies(env, agent, policies, num_episodes=20):
-    """
-    Evaluates the trained agent against baseline policies.
-    """
-    results = {}
-
-    print(f"Starting evaluation over {num_episodes} episodes per policy...")
-
-    for name, policy_func in policies.items():
-        print(f"Evaluating: {name}")
-        policy_rewards = []
-
-        for _ in range(num_episodes):
-            state = env.reset()
-            total_reward = 0
-            done = False
-
-            while not done:
-                if name == "Double DQN":
-                    # Use the trained agent (exploit only, epsilon=0)
-                    original_epsilon = agent.epsilon
-                    agent.epsilon = 0.0
-                    actions = agent.choose_actions(state)
-                    agent.epsilon = original_epsilon # restore epsilon
-                else:
-                    # Use the baseline policy function
-                    actions = policy_func(state, env)
-
-                next_state, reward = env.step(actions)
-                total_reward += reward
-                state = next_state
-                done = env.is_episode_done()
-
-            policy_rewards.append(total_reward)
-
-        results[name] = policy_rewards
-        print(f"  -> Avg Reward: {np.mean(policy_rewards):.2f}")
-
-    return results
-
-def compare_policies(config, eval_policies, eval_episodes):
-  global save_dir
-
-  # Ensure your environment is reset with the same parameters used for training
-  eval_env = FlowLineEnvironment(
-      **config['env_params']
-  )
-
-  assert save_dir is not None, "Checkpoint directory path 'save_dir' has not been set."
-
-  filename = f"ddqn_{config['ID']}.pth"
-  checkpoint_path = os.path.join(save_dir, filename)
-  eval_agent = load_trained_agent(eval_env, checkpoint_path, config)
-
-  # --- Run Evaluation ---
-  # Assuming 'agent' is your trained DoubleDQNAgent instance from the training block
-  eval_results = evaluate_policies(eval_env, eval_agent, eval_policies, num_episodes=eval_episodes)
-
-  # --- Box Plot ---
-  # Convert results to a DataFrame for plotting with Seaborn
-  df_results = pd.DataFrame(eval_results)
-
-  plt.figure(figsize=(10, 6))
-  sns.boxplot(data=df_results, palette="viridis")
-
-  plt.title("Comparison of Accumulated Rewards (Costs) over 1000 Steps", fontsize=14)
-  plt.ylabel("Accumulated Reward (Negative Cost)", fontsize=12)
-  plt.xlabel("Policy Method", fontsize=12)
-  plt.grid(True, axis='y', linestyle='--', alpha=0.7)
-  plt.xticks(rotation=0) # Keep labels horizontal
-
-  plt.tight_layout()
-  plt.show()
-
-  figname = f"ddqn_{config['ID']}_comparison.png"
-  figpath = os.path.join(save_dir, figname)
-  plt.savefig(figpath, dpi=300)
-
-  print("\nDetailed Statistics:")
-  print(df_results.describe().loc[['mean', 'std', 'min', 'max']].T)
 
 # Define the specific thresholds for weekly, biweekly, monthly
 # Assuming 1 timestep = 1 day (adjust based on your simulation's time scale)
