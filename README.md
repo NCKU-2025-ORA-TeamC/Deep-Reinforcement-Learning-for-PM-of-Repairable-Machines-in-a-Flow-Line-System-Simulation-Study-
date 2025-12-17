@@ -1,19 +1,22 @@
 # Deep Reinforcement Learning for Preventive Maintenance of Repairable Machines in a Flow Line System - A Simulation Study
 Final report of Operations Research Applications, Dec 2025 @ NCKU Institute of Manufacturing Information and Systems 
 
-Group C
+
+<div align="center">
+ 
+### Group C
 | Name                 | Student ID    |
 |----------------------|---------------|
 | **Jen-Chien, Tseng** | **C24106121** |
 | **Sing-Yu, Bao**     | **N46144056** |
 | **Josue Fernandez**  | **P76147051** |
 
+</div>
 ![Made with Python](https://img.shields.io/badge/Made%20with-Python-blue?logo=python)
 
 # 1. Title
 
 **Deep Reinforcement Learning for PM of Repairable Machines in a Flow Line System Simulation Study**
-*A Double Deep Q-Network (DDQN) approach under stochastic machine failures*
 
 ---
 
@@ -149,7 +152,7 @@ Two datasets are generated via simulation, corresponding to the two scenarios.
 All data are generated online during agent–environment interaction. This ensures consistency between training and evaluation conditions and allows fair comparison across scenarios.
 
 <div align="center">
- 
+
 | Dimension     | Scenario A | Scenario B |
 | ------------- | ---------- | ---------- |
 | Machines      | 1          | 4          |
