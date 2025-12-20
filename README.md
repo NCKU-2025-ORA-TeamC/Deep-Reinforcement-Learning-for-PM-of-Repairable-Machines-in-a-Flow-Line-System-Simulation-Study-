@@ -204,9 +204,11 @@ To assess learning dynamics, convergence behavior and reward variance across epi
 
 In Scenario A, characterized by a low-dimensional state space and a linear failure process, the DDQN converges rapidly. The learned preventive maintenance policy closely resembles a simple age-threshold rule, with preventive actions triggered primarily by machine age rather than system-level conditions. This result suggests that in low-complexity environments with minimal machine interactions, sophisticated decision-making provides limited additional benefit over traditional heuristic policies.
 <img width="1503" height="1018" alt="圖片" src="https://github.com/user-attachments/assets/bb0db56e-0940-41b2-a6cc-e5e78208ad41" />
+<img width="984" height="583" alt="圖片" src="https://github.com/user-attachments/assets/0292a175-469b-4d8f-b6f7-5d2f7f429cc3" />
 
 In contrast, Scenario B exhibits fundamentally different behavior. Due to the presence of multiple machines, finite buffers, and a Weibull failure process, maintenance decisions have pronounced system-wide effects. The learned policy deviates significantly from a pure age-based strategy. Preventive maintenance actions are influenced not only by machine deterioration but also by buffer occupancy and downstream congestion, reflecting the agent’s ability to anticipate failure propagation and production disruptions.
 <img width="1476" height="1018" alt="圖片" src="https://github.com/user-attachments/assets/57677447-119e-4cbd-9705-e925f1ab8a40" />
+<img width="984" height="583" alt="圖片" src="https://github.com/user-attachments/assets/9855ae3a-6dcf-4831-b2cd-00d170466fc1" />
 
 Learning convergence in Scenario B is slower and exhibits higher variance, highlighting the increased difficulty of training reinforcement learning agents in high-dimensional and highly stochastic environments.
 
@@ -218,9 +220,8 @@ First, for low-complexity production systems with limited interactions, simple h
 Second, as system complexity increases, maintenance decisions based solely on local information, such as machine age, become increasingly inefficient. Ignoring buffer interactions and downstream effects can lead to poorly timed maintenance actions and elevated production losses.
 Finally, reinforcement learning-based preventive maintenance policies offer the greatest value in environments where maintenance decisions generate system-wide ripple effects. In such settings, data-driven policies that explicitly account for interactions among machines and buffers can significantly reduce corrective maintenance and improve overall system performance.
 
-<img width="984" height="583" alt="圖片" src="https://github.com/user-attachments/assets/9855ae3a-6dcf-4831-b2cd-00d170466fc1" />
 
-5. Conclusion
+# 5. Conclusion
 
 This study investigated preventive maintenance scheduling in repairable flow-line manufacturing systems using a deep reinforcement learning approach. By formulating the problem as a Markov Decision Process and applying a Double Deep Q-Network, the proposed framework integrates machine degradation, buffer dynamics, and stochastic production effects within a unified decision-making model.
 
