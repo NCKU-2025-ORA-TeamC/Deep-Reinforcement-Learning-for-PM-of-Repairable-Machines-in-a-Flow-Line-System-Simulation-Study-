@@ -130,6 +130,9 @@ $$a_t = (a_t^1, a_t^2, ..., a_t^M), a_t^i ∈ [0,1]$$
 
 where `a_t^i = 1` indicates performing preventive maintenance on machine `i`. Corrective maintenance is triggered automatically upon failure.
 
+<img width="2550" height="1275" alt="17662313782002392492082790553708" src="https://github.com/user-attachments/assets/ce425d5e-b26e-4186-976d-1d6a2bb2cbb0" />
+
+
 **State transition**
 System transitions are governed by production capacity, buffer constraints, stochastic arrivals, and probabilistic machine failures. Transition probabilities are unknown and learned implicitly through interaction.
 
@@ -159,6 +162,10 @@ The objective is to learn a policy `π(a|s)` that maximizes the expected discoun
 - Learning rate starts at 0.0004 and decays by a factor of 0.5 every 200 episodes
 - ε-greedy exploration with logarithmic decay
 - Target network updates every 10 episodes
+
+<img width="2047" height="1107" alt="17662314341891928642614055562249" src="https://github.com/user-attachments/assets/089a1630-c7dc-4894-8ab1-9c340a0ae892" />
+
+
 ---
 
 # 4. Data Collection and Analysis Results
