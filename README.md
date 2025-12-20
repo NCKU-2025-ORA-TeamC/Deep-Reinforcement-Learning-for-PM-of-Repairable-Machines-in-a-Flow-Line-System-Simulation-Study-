@@ -17,29 +17,43 @@ Final report of Operations Research Applications, Dec 2025 @ NCKU Institute of M
 
 # 1. Title
 
-**Deep Reinforcement Learning for PM of Repairable Machines in a Flow Line System Simulation Study**
+**Deep Reinforcement Learning for Preventive Maintenance in Flow-Line Manufacturing Systems with scenario comparison**
 
 ---
 
 # 2. Background and Motivation
 ## 2.1 Motivation
 
-In flow-line manufacturing systems, unexpected machine failures lead to production loss, buffer starvation or blockage, and high corrective maintenance (CM) costs. Preventive maintenance (PM) decisions must balance maintenance expenses against reliability and throughput. Traditional rule-based or threshold-based PM policies (e.g., age-based rules) are often suboptimal in multi-machine systems with stochastic failures and interactions through buffers. This motivates the use of reinforcement learning (RL) to learn adaptive PM policies directly from system dynamics.
+In flow-line manufacturing systems, machine failures not only incur direct repair costs but also propagate disruptions through upstream starvation and downstream blockage, resulting in significant production losses. Preventive maintenance (PM) policies are therefore critical for maintaining system reliability and throughput.
+
+However, in practice, manufacturing systems operate under diverse conditions, such as different machine reliability characteristics, buffer capacities, and cost structures. Traditional preventive maintenance strategies, including run-to-failure or fixed age-based policies, are typically designed under restrictive assumptions and often lack adaptability across varying operational environments. Recent studies have shown that such rule-based policies can be suboptimal in flow-line systems with stochastic deterioration and strong machine interactions, motivating the need for more adaptive decision-making frameworks (Hung et al., 2024).
+
+Recent advances in reinforcement learning (RL) offer a promising data-driven approach to learning maintenance policies directly from system dynamics through sequential interactions with the environment. RL-based approaches have been increasingly applied to manufacturing maintenance problems, demonstrating their ability to handle uncertainty and complex system interactions, including multi-level and multi-agent preventive maintenance settings (Su et al., 2022). Motivated by this potential, this study aims to examine the effectiveness and robustness of RL-based preventive maintenance policies across multiple flow-line manufacturing scenarios.
 
 ## 2.2 Background
 
-A flow-line system consists of sequential machine stages connected by buffers. Machine degradation is stochastic, failures increase with age, and upstream/downstream interactions amplify local decisions into system-wide effects. Discrete-event simulation is well-suited for modeling such systems, while RL provides a data-driven approach to decision-making under uncertainty without requiring explicit analytical solutions.
+A flow-line manufacturing system consists of sequential production stages connected by finite buffers. Machine deterioration is stochastic, and failure probabilities typically increase with operating age. Due to buffer constraints and machine interactions, failures at one stage can cause cascading effects throughout the system, amplifying local disruptions into system-wide performance losses. Analytical optimization of maintenance policies in such systems is challenging, particularly when failure processes and production flows are uncertain and interdependent.
+
+Discrete-event simulation provides a flexible tool for modeling complex flow-line dynamics under stochastic deterioration and production variability. When combined with reinforcement learning, simulation-based environments enable adaptive maintenance policies to be learned without requiring explicit analytical system models. Recent surveys have highlighted the growing role of reinforcement learning and deep reinforcement learning in maintenance planning, scheduling, and optimization problems, especially in settings where traditional optimization approaches become intractable (Ogunfowora & Najjaran, 2023).
+
+Several recent studies have successfully applied simulation-based deep reinforcement learning frameworks to production systems with deterioration. For example, Ferreira Neto et al. (2024) demonstrated the effectiveness of deep reinforcement learning for maintenance optimization in a scrap-based steel production line, while Geurtsen et al. (2026) investigated deep reinforcement learning for optimal maintenance planning in deteriorating flow-line systems. These studies illustrate the potential of integrating simulation and deep reinforcement learning to address complex maintenance decision problems. Building on this line of research, the present study adopts a simulation–learning framework to systematically compare learned preventive maintenance policies with traditional rule-based approaches under different system configurations.
 
 ## 2.3 Problem Definition
 
-This study formulates preventive maintenance scheduling for a repairable flow-line production system as a Markov Decision Process (MDP) and proposes a Double Deep Q-Network (DDQN) to minimize long-run expected total cost arising from maintenance actions and production losses due to starvation and blockage.
+- This study formulates the preventive maintenance scheduling problem in a repairable flow-line manufacturing system as a Markov Decision Process (MDP), Double Deep Q-Network (DDQN) is proposed to learn maintenance decisions that minimize the long-run expected total cost, including preventive and corrective maintenance costs as well as production losses due to starvation and blockage. 
+
+- The learned policy is evaluated across different scenarios and compared with maintenance strategies to assess its performance and robustness.
 
 ---
 
 # 3. Methodology
 ## 3.1 Scenario Design and Comparison Framework
 
-This study is explicitly designed as a controlled comparison between two scenarios with different system complexity, aiming to identify when and why deep reinforcement learning becomes necessary for preventive maintenance (PM) decisions.
+The general structural of flow-Line systems show as below:
+
+<img width="5330" height="2250" alt="圖片" src="https://github.com/user-attachments/assets/0320ef7b-7a9e-4cb8-9fb1-fed2107ef59e" />
+
+Our study is explicitly designed as a controlled comparison between two scenarios with different system complexity, aiming to identify when and why deep reinforcement learning becomes necessary for preventive maintenance (PM) decisions.
 
 Rather than evaluating a single system in isolation, we construct two scenarios that share the same modeling philosophy but differ in structural and stochastic characteristics. This allows us to isolate the effect of system complexity on policy learning and performance, as well as measure the added value from training reinforcement learning model for different levels of complexity.
 
@@ -53,6 +67,8 @@ Rather than evaluating a single system in isolation, we construct two scenarios 
 
 This scenario serves as a benchmark. Its purpose is not to maximize RL performance, but to verify whether the DDQN can learn intuitive PM behavior comparable to classical age-based or threshold-based policies.
 
+<img width="1656" height="540" alt="圖片" src="https://github.com/user-attachments/assets/02f95fe7-415a-42ab-8cdf-bda2a09f787d" />
+
 ### Scenario B: Complex Flow-Line System (Target Scenario)
 
 - Two buffers and two sequential stages
@@ -62,6 +78,9 @@ This scenario serves as a benchmark. Its purpose is not to maximize RL performan
 - Strong interdependence through buffers, allowing blockage and starvation to propagate
 
 This scenario represents a realistic manufacturing environment, where local maintenance decisions generate non-local system impacts.
+
+<img width="2951" height="975" alt="圖片" src="https://github.com/user-attachments/assets/4045ec30-7d25-4317-b177-7a603b656cf2" />
+
 
 **Comparison Objectives The two scenarios are compared along the following dimensions:**
 
@@ -166,7 +185,7 @@ All data are generated online during agent–environment interaction. This ensur
 
 ## 4.2 Analysis
 
-The DDQN is trained and evaluated separately under Scenario A and Scenario B using identical learning hyperparameters. This ensures that observed performance differences are attributable to system structure rather than algorithmic tuning.
+The DDQN is trained and evaluated separately under Scenario A and Scenario B using identical network architectures and learning hyperparameters. This design ensures that observed performance differences can be attributed to differences in system structure and stochastic characteristics rather than algorithmic tuning.
 
 For each scenario, we track:
 - Episode-level cumulative reward (total cost)
@@ -175,49 +194,51 @@ For each scenario, we track:
 - Frequency of starvation and blockage events
 - Training convergence behavior is also compared to examine how state dimensionality and stochastic complexity affect learning stability.
 
+During training, the agent interacts with the simulated environment and makes maintenance decisions based on the observed system state. Performance is evaluated using episode-level cumulative reward, which represents the total expected cost incurred from preventive maintenance, corrective maintenance, and production losses due to starvation and blockage. In addition to cumulative reward, operational indicators are recorded to provide insights into policy behavior, including the frequency of preventive and corrective maintenance actions, the average machine age at which preventive maintenance is performed, and the occurrence of starvation and blockage events.
+
+To assess learning dynamics, convergence behavior and reward variance across episodes are also analyzed. Comparing learning stability between the two scenarios allows us to examine how state-space dimensionality and stochastic failure processes influence the effectiveness and efficiency of reinforcement learning in preventive maintenance problems.
+
+
 ## 4.3 Results and Managerial Implications
 
 **Comparative Results**
 
-In Scenario A, the DDQN converges quickly and learns a PM policy closely resembling an age-threshold rule, indicating limited marginal benefit of complex decision-making.
+In Scenario A, characterized by a low-dimensional state space and a linear failure process, the DDQN converges rapidly. The learned preventive maintenance policy closely resembles a simple age-threshold rule, with preventive actions triggered primarily by machine age rather than system-level conditions. This result suggests that in low-complexity environments with minimal machine interactions, sophisticated decision-making provides limited additional benefit over traditional heuristic policies.
 <img width="1503" height="1018" alt="圖片" src="https://github.com/user-attachments/assets/bb0db56e-0940-41b2-a6cc-e5e78208ad41" />
 
-In Scenario B, the learned policy deviates significantly from pure age-based behavior. PM actions are influenced by buffer occupancy, downstream congestion, and failure risk propagation.
+In contrast, Scenario B exhibits fundamentally different behavior. Due to the presence of multiple machines, finite buffers, and a Weibull failure process, maintenance decisions have pronounced system-wide effects. The learned policy deviates significantly from a pure age-based strategy. Preventive maintenance actions are influenced not only by machine deterioration but also by buffer occupancy and downstream congestion, reflecting the agent’s ability to anticipate failure propagation and production disruptions.
 <img width="1476" height="1018" alt="圖片" src="https://github.com/user-attachments/assets/57677447-119e-4cbd-9705-e925f1ab8a40" />
 
-Corrective maintenance frequency is substantially reduced in Scenario B compared to reactive maintenance, despite similar average PM effort.
-
-Learning convergence in Scenario B is slower and exhibits higher variance, reflecting increased state dimensionality and stochasticity.
+Learning convergence in Scenario B is slower and exhibits higher variance, highlighting the increased difficulty of training reinforcement learning agents in high-dimensional and highly stochastic environments.
 
 **Managerial Implications**
 
-For low-complexity production systems, simple heuristic PM rules may be sufficient.
+The results provide several insights for maintenance decision-makers. 
 
-As system complexity increases, ignoring buffer interactions leads to inefficient maintenance timing.
-
-RL-based PM policies are most valuable in environments where maintenance decisions have system-wide ripple effects.
+First, for low-complexity production systems with limited interactions, simple heuristic preventive maintenance rules may be sufficient and cost-effective. Implementing advanced learning-based approaches in such environments may yield marginal improvements that do not justify additional complexity.
+Second, as system complexity increases, maintenance decisions based solely on local information, such as machine age, become increasingly inefficient. Ignoring buffer interactions and downstream effects can lead to poorly timed maintenance actions and elevated production losses.
+Finally, reinforcement learning-based preventive maintenance policies offer the greatest value in environments where maintenance decisions generate system-wide ripple effects. In such settings, data-driven policies that explicitly account for interactions among machines and buffers can significantly reduce corrective maintenance and improve overall system performance.
 
 <img width="984" height="583" alt="圖片" src="https://github.com/user-attachments/assets/9855ae3a-6dcf-4831-b2cd-00d170466fc1" />
 
 5. Conclusion
 
-This study demonstrates that preventive maintenance scheduling in repairable flow-line systems can be effectively modeled as an MDP and solved using DDQN. By integrating machine degradation, buffer dynamics, and stochastic demand, the proposed approach provides a flexible and adaptive alternative to traditional maintenance heuristics. Future work may incorporate maintenance capacity constraints, partial observability, or multi-objective optimization.
+This study investigated preventive maintenance scheduling in repairable flow-line manufacturing systems using a deep reinforcement learning approach. By formulating the problem as a Markov Decision Process and applying a Double Deep Q-Network, the proposed framework integrates machine degradation, buffer dynamics, and stochastic production effects within a unified decision-making model.
+
+Through a scenario-based comparison, the results demonstrate that the effectiveness of reinforcement learning-based preventive maintenance strongly depends on system complexity. In low-complexity environments, the learned policy converges to behavior similar to simple age-based heuristics, indicating limited marginal benefit from advanced learning approaches. In contrast, for high-complexity systems with strong machine interactions and nonlinear failure processes, the reinforcement learning agent learns nontrivial maintenance strategies that substantially reduce corrective maintenance and mitigate system-wide disruptions.
+
+These findings suggest that reinforcement learning should be viewed as a targeted decision-support tool rather than a universal replacement for traditional maintenance rules. Its value is most pronounced in complex manufacturing systems where local maintenance decisions have far-reaching operational consequences. Future research may extend this framework to incorporate maintenance capacity constraints, partial observability, or multi-objective considerations to further enhance its practical applicability.
 
 ---
 
 # 6. References
 
-Alrabghi, A., & Tiwari, A. (2015). State of the art in simulation-based optimisation for maintenance systems. Computers & Industrial Engineering, 82, 167–182. https://doi.org/10.1016/j.cie.2014.12.022
+Ferreira Neto, W. A., Cavalcante, C. A. V., & Do, P. (2024). Deep reinforcement learning for maintenance optimization of a scrap-based steel production line. Reliability Engineering & System Safety, 249, Article 110199. https://doi.org/10.1016/j.ress.2024.110199
 
-Cassady, C. R., & Kutanoglu, E. (2005). Integrating preventive maintenance planning and production scheduling for a single machine. IEEE Transactions on Reliability, 54(2), 304–309. https://doi.org/10.1109/TR.2005.845967
+Geurtsen, M., Leenen, C., Adan, I., & Atan, Z. (2026). Deep reinforcement learning for optimal planning of production line maintenance with deterioration. Reliability Engineering & System Safety, 266(Part B), Article 111767. https://doi.org/10.1016/j.ress.2025.111767
 
 Hung, YH., Shen, HY. & Lee, CY. Deep reinforcement learning-based preventive maintenance for repairable machines with deterioration in a flow line system. Ann Oper Res (2024).https://doi.org/10.1007/s10479-024-06207-x
 
 Jianyu Su, Jing Huang, Stephen Adams, Qing Chang, and Peter A. Beling. 2022. Deep multi-agent reinforcement learning for multi-level preventive maintenance in manufacturing systems▪. Expert Syst. Appl. 192, C (Apr 2022). https://doi.org/10.1016/j.eswa.2021.116323
 
-Liu, Y., Wang, W., Hu, Y., Hao, J., Chen, X., & Gao, Y. (2019). Multi-agent game abstraction via graph attention neural network. arXiv preprint arXiv:1911.10715. https://doi.org/10.48550/arXiv.1911.10715
-
-Sutton, R. S., & Barto, A. G. (2018). Reinforcement learning: An introduction (2nd ed.). The MIT Press.
-
-van Hasselt, H., Guez, A., & Silver, D. (2016). Deep reinforcement learning with double Q-learning. Proceedings of the AAAI Conference on Artificial Intelligence, 30(1). https://doi.org/10.1609/aaai.v30i1.10295
-
+Ogunfowora, O., & Najjaran, H. (2023). Reinforcement and deep reinforcement learning-based solutions for machine maintenance planning, scheduling policies, and optimization. Journal of Manufacturing Systems, 70, 244–263. https://doi.org/10.1016/j.jmsy.2023.07.014
