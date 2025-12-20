@@ -88,21 +88,6 @@ This scenario represents a realistic manufacturing environment, where local main
 - Accumulated total system cost
 - Sensitivity of learned policies to buffer congestion and starvation risk
 
-<div align="center">
- 
-| Dimension / Feature         | Scenario A (Simple)        | Scenario B (Complex)                         |
-| --------------------------- | -------------------------- | -------------------------------------------- |
-| Machines                    | 1                          | 4 (2 per stage)                              |
-| Buffers                     | 1                          | 2                                            |
-| Failure Model               | Linear age-dependent       | Weibull (k > 1, aging-induced)               |
-| Machine Interactions        | Minimal / None             | Strong (starvation & blockage propagate)     |
-| PM Strategy Learned         | Age-based (heuristic-like) | System-aware (considers buffer & congestion) |
-| Corrective Maintenance (CM) | Few                        | Reduced compared to heuristic                |
-| Convergence Speed (RL)      | Fast                       | Slower, higher variance                      |
-| Value of RL                 | Low                        | High                                         |
-| Total Cost Impact           | Minimal                    | Significant reduction                        |
-</div>
-
 ## 3.2 Method Justification
 
 **Method Justification Assumptions & Conditions**
