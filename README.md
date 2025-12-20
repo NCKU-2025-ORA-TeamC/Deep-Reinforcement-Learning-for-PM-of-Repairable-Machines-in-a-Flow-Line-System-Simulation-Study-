@@ -1,6 +1,5 @@
-# Deep Reinforcement Learning for Preventive Maintenance of Repairable Machines in a Flow Line System - A Simulation Study
+# Deep Reinforcement Learning for Preventive Maintenance in Flow-Line Manufacturing Systems with scenario comparison
 Final report of Operations Research Applications, Dec 2025 @ NCKU Institute of Manufacturing Information and Systems 
-
 
 
 <div align="center">
